@@ -31,16 +31,16 @@ var array<string> nameArray;
 
 static function FillPlayInfo(PlayInfo PlayInfo)
 {
-  	Super.FillPlayInfo(PlayInfo);
+  Super.FillPlayInfo(PlayInfo);
 
  	PlayInfo.AddSetting(default.RulesGroup, "iSlapDamage","Slap Damage",1,0, "Text", "4;1:100",,,True);
-  	PlayInfo.AddSetting(default.RulesGroup, "iMaxZedsNum","Max exited zeds count",1,0, "Text", "4;6:600",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "iMaxZedsNum","Max exited zeds count",1,0, "Text", "4;6:600",,,True);
  	PlayInfo.AddSetting(default.RulesGroup, "iTraderTime","Trader time count down",1,0, "Text", "6;6:1000",,,True);
-  	PlayInfo.AddSetting(default.RulesGroup, "iFakedPlayer","Faked Player Count",1,0, "Text", "4;0:5",,,True);
-  	PlayInfo.AddSetting(default.RulesGroup, "iMaxPlayers","Max player capacity",1,0, "Text", "4;0:99",,,True);
-  	PlayInfo.AddSetting(default.RulesGroup, "iHealthConfig","Set zeds health scale.Set 0 if not want to change",1,0, "Text", "4;0:99",,,True);
-  	PlayInfo.AddSetting(default.RulesGroup, "fSpawnMod","Multiply default spawn intervel.",1,0, "Text", "4;0:10",,,True);
-    PlayInfo.AddSetting(default.RulesGroup, "iStartCash","Starting cash.Set -1 is not want to change.",1,0, "Text", "6;-1:999999",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "iFakedPlayer","Faked Player Count",1,0, "Text", "4;0:5",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "iMaxPlayers","Max player capacity",1,0, "Text", "4;0:99",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "iHealthConfig","Set zeds health scale.Set 0 if not want to change",1,0, "Text", "4;0:99",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "fSpawnMod","Multiply default spawn intervel.",1,0, "Text", "4;0:10",,,True);
+  PlayInfo.AddSetting(default.RulesGroup, "iStartCash","Starting cash.Set -1 is not want to change.",1,0, "Text", "6;-1:999999",,,True);
 }
 
 static event string GetDescriptionText(string PropName)
@@ -101,6 +101,16 @@ function MaxZedsNum(int maxNum)
 		KFGT.MaxMonsters = Clamp(KFGT.TotalMaxMonsters,5,maxNum);		
 		BroadcastMessage("Current MaxZedsNum : " $ string(KFGT.MaxMonsters)); 		
 	}
+}
+
+function ModifyPlayer(Pawn Other)
+{
+	// called by GameInfo.RestartPlayer()
+	if ( NextMutator != None )
+		NextMutator.ModifyPlayer(Other);
+
+    if(Other.PlayerReplicationInfo.Score<iStartCash)
+      Other.PlayerReplicationInfo.Score = iStartCash;
 }
 
 function MaxPlayersNum(int maxNum)
@@ -290,7 +300,7 @@ function Mutate(string MutateString, PlayerController Sender)
 
 defaultproperties
 {
-	iStartCash=100
+	  iStartCash=100
   	fSpawnMod=1
   	iHealthConfig=0
   	iMaxPlayers=6
